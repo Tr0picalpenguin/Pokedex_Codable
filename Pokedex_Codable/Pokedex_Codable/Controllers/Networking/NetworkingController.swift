@@ -36,16 +36,12 @@ class NetworkingController {
     
     // MARK: - Endpoint 2
     
-    static func fetchPokemon(with searchTerm: String, completion: @escaping (Result<Pokemon, ResultError>) -> Void) {
-        
-        guard let baseURL = URL(string: baseURLString) else {return}
-        var urlComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
-        urlComponents?.path = "/api/v2/pokemon/\(searchTerm.lowercased())"
+    static func fetchPokemon(with pokemonUrlString: String, completion: @escaping (Result<Pokemon, ResultError>) -> Void) {
 
-        guard let finalURL = urlComponents?.url else {
-            completion(.failure(.invalidURL((urlComponents?.url)!)))
-                       return}
-        print(finalURL)
+        guard let finalURL = URL(string: pokemonUrlString) else {
+            completion(.failure(.invalidURL(URL(string: pokemonUrlString)!)))
+                       return
+        }
         
         URLSession.shared.dataTask(with: finalURL) { dTaskData, _, error in
             if let error = error {

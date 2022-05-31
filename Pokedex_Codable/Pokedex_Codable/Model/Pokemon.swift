@@ -18,18 +18,16 @@ struct ResultsDictionary: Decodable {
 }
 
 struct Pokemon: Decodable {
-    enum Keys: String {
+    private enum Keys: String {
         case name = "name"
         case id = "id"
-        case moves = "moves"
         case sprites = "sprites"
-        case frontShiny = "front_shiny"
-        case move = "move"
     }
     
     let name: String
     let id: Int
     let sprites: Sprites
+//    let moves: Moves
 }
 
 struct Sprites: Decodable {
@@ -38,7 +36,6 @@ struct Sprites: Decodable {
         case frontShiny = "front_shiny"
         case frontFemale = "front_female"
         case frontShinyFemale = "front_shiny_female"
-        
     }
     
     let frontDefault: String
@@ -46,3 +43,19 @@ struct Sprites: Decodable {
     let frontFemale: String?
     let frontShinyFemale: String?
 }
+
+//struct Moves: Decodable {
+//    private enum CodingKeys: String, CodingKey {
+//        case move = "moves"
+//    }
+//    let move: Move
+//}
+//
+//struct Move: Decodable {
+//    private enum CodingKeys: String, CodingKey {
+//        case name = "name"
+//        case moveUrl = "url"
+//    }
+//    let name: String
+//    let moveUrl: String
+//}
