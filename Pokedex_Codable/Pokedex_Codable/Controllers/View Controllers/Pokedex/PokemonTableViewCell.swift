@@ -30,13 +30,13 @@ class PokemonTableViewCell: UITableViewCell {
     }
     
     func fetchImage(for pokemon: Pokemon) {
-        NetworkingController.fetchImage(for: pokemon) { [weak self] result in
+        NetworkingController.fetchImage(for: pokemon.sprites.frontShiny) { result in
             switch result {
             case.success(let image):
                 DispatchQueue.main.async {
-                    self?.pokemonSpriteImageView.image = image
-                    self?.pokemonNameLabel.text = pokemon.name.capitalized
-                    self?.pokemonIdLabel.text = "No: \(pokemon.id)"
+                    self.pokemonSpriteImageView.image = image
+                    self.pokemonNameLabel.text = pokemon.name.capitalized
+                    self.pokemonIdLabel.text = "No: \(pokemon.id)"
                 }
             case.failure(let error):
                 print("There was an error!", error.errorDescription!)

@@ -10,6 +10,7 @@ import UIKit
 class PokedexTableViewController: UITableViewController {
     
     var pokedex: [ResultsDictionary] = []
+    var topLevelPokedex: Pokedex?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,6 +19,7 @@ class PokedexTableViewController: UITableViewController {
             switch result {
             case.success(let pokedex):
                 self?.pokedex = pokedex.results
+                self?.topLevelPokedex = pokedex
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
                 }
@@ -42,10 +44,31 @@ class PokedexTableViewController: UITableViewController {
         return cell
     }
     
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let lastPokedexIndex = pokedex.count - 1
+        guard let topLevelPokedex = topLevelPokedex,
+        let nextURL = URL(string: topLevelPokedex.nextURL) else {return}
+        
+        if indexPath.row == lastPokedexIndex {
+            NetworkingController.fetchPokedex(with: nextURL) { [weak self] result in
+                switch result {
+                case.success(let pokedex):
+                    self?.topLevelPokedex = pokedex
+                    self?.pokedex.append(contentsOf: pokedex.results)
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
+                    }
+                case.failure(let error):
+                    print("there was an error!", error.errorDescription!)
+                }
+            }
+        }
+    }
+    
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-       
+        
         
         if segue.identifier == "toPokedexTableVC" {
             //Index
@@ -60,17 +83,16 @@ class PokedexTableViewController: UITableViewController {
                                 destination.pokemon = pokemon
                             }
                         case.failure(let error):
-                            print("There was an Error!", error.localizedDescription)
+                            print("There was an Error!", error.errorDescription!)
                         }
-                    
                     }
                 }
             }
         }
-    } // End of class
-    
-    
-    
+    }
+}
+
+
 
 
 

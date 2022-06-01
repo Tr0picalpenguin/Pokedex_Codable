@@ -9,7 +9,7 @@ import UIKit
 
 class PokemonViewController: UIViewController {
 
-    @IBOutlet weak var pokemonSearchBar: UISearchBar!
+   
     @IBOutlet weak var pokemonIDLabel: UILabel!
     @IBOutlet weak var pokemonNameLabel: UILabel!
     @IBOutlet weak var pokemonSpriteImageView: UIImageView!
@@ -19,21 +19,33 @@ class PokemonViewController: UIViewController {
         super.viewDidLoad()
         pokemonMovesTableView.delegate = self
         pokemonMovesTableView.dataSource = self
-        pokemonSearchBar.delegate = self
+       
     }
     
-    var pokemon: Pokemon?
+    var pokemon: Pokemon? {
+        didSet {
+            updateViews()
+        }
+    }
     
-    func updateViews(for pokemon: Pokemon) {
-        NetworkingController.fetchImage(for: pokemon) { image in
-            guard let image = image else {return}
-            DispatchQueue.main.async {
-                self.pokemon = pokemon
-                self.pokemonSpriteImageView.image = image
-                self.pokemonIDLabel.text = ("No:\(pokemon.id)")
-                self.pokemonNameLabel.text = pokemon.name.capitalized
-                self.pokemonMovesTableView.reloadData()
+    func updateViews() {
+        guard let pokemon = pokemon else {
+            return
+        }
+        NetworkingController.fetchImage(for: pokemon.sprites.frontShiny) { result in
+            switch result {
+            case.success(let image):
+                DispatchQueue.main.async {
+                    self.pokemon = pokemon
+                    self.pokemonSpriteImageView.image = image
+                    self.pokemonIDLabel.text = ("No:\(pokemon.id)")
+                    self.pokemonNameLabel.text = pokemon.name.capitalized
+                    self.pokemonMovesTableView.reloadData()
+                }
+            case.failure(let error):
+                print("There was an error!", error.errorDescription!)
             }
+           
         }
     }
     
@@ -55,18 +67,8 @@ extension PokemonViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "moveCell", for: indexPath)
         guard let pokemon = pokemon else {return UITableViewCell() }
         let move = pokemon.moves[indexPath.row]
-        cell.textLabel?.text = move
+        cell.textLabel?.text = move.move.name
         return cell
     }
 }
 
-extension PokemonViewController: UISearchBarDelegate {
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        NetworkingController.fetchPokemon(with: searchText) { pokemon in
-            guard let pokemon = pokemon else {
-                return
-            }
-            self.updateViews(for: pokemon)
-        }
-    }
-}

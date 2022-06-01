@@ -64,9 +64,9 @@ class NetworkingController {
     
     //MARK: - Endpoint 3
     
-    static func fetchImage(for pokemon: Pokemon, completetion: @escaping (Result<UIImage, ResultError>) -> Void) {
-        guard let imageURL = URL(string: pokemon.sprites.frontShiny) else {
-            completetion(.failure(.invalidURL(URL(string: pokemon.sprites.frontShiny)!)))
+    static func fetchImage(for pokemon: String, completetion: @escaping (Result<UIImage, ResultError>) -> Void) {
+        guard let imageURL = URL(string: pokemon) else {
+            completetion(.failure(.invalidURL(URL(string: pokemon)!)))
             return}
         
         URLSession.shared.dataTask(with: imageURL) { data, _, error in
